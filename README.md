@@ -9,7 +9,7 @@
 * simple-proxy - задание A  
 Пример работы в `simple.mov`
 
-* proxy-with-blacklist - сервер с черным списком из задания C
+* proxy-with-blacklist - сервер с черным списком из задания C  
 Пример работы в `blacklist.mov`
 
 Кеширование не успел сделать
