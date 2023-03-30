@@ -1,0 +1,3 @@
+some text file
+This file is to be sent by the email 
+and delivered to someone
