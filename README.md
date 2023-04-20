@@ -4,13 +4,13 @@
 ## Клиент и сервер с протоколом Stop and Wait
 
 ```
-go run server/main.go <timeout>
-go run client/main.go <timeout> filename
+go run server/main.go
+go run client/main.go filename <timeout>
 ```
+`<timeout>` - таймаут в секундах  
+`filename` - файл чтобы отправить серверу
+например `client/some.txt`
 
-Два сценария: 
+Сервер примет файл и сохранит у себя в файле recieve.txt
 
-```
-go run server/main.go 1 --send-mode
-go run client/main.go 
-```
+Пропадание пакетов не успел сделать

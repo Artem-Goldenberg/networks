@@ -46,16 +46,14 @@ func main() {
 
 func initiateProtocol(l net.PacketConn, n int) []byte { 
 	all_data := new(bytes.Buffer)
-	buf := make([]byte, MaxPackageSize + headerLength)
+	buf := make([]byte, MaxPackageSize + headerLength + 10)
 	for i := 0; i < n; i++ {
 		n, address, err := l.ReadFrom(buf)
-		log.Printf("String: %q\n", string(buf[6:26]))
 		check(err)
 		l.WriteTo(makeAckPackage(getNum(buf)), address)
 		length := getLength(buf)
 		log.Printf("Received %d bytes, length = %d\n", n, length)
 		if len(buf) >= headerLength {
-			// fmt.Fprint(all_data, buf[headerLength:length])
 			all_data.Write(buf[headerLength:length])
 		}
 	}

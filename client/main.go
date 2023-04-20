@@ -8,6 +8,7 @@ import (
 	"math"
 	"net"
 	"os"
+	"strconv"
 	"time"
 )
 
@@ -15,12 +16,15 @@ import (
 const MaxPackageSize = 2 // 10 Kb
 
 func main() { 
-	// if len(os.Args) < 2 { 
-	// 	fmt.Println("Usage: go run client/go filepath")
-	// 	return
-	// }
-	data, err := os.ReadFile("some.txt")
+	if len(os.Args) < 2 { 
+		fmt.Println("Usage: go run client/go <timeout> filepath")
+		return
+	}
+	data, err := os.ReadFile(os.Args[1])
+	t, _ := strconv.Atoi(os.Args[2])
 	check(err)
+	var timeout time.Duration
+	timeout = time.Second * time.Duration(t)
 
 	segments := split(data)
 	
@@ -32,17 +36,15 @@ func main() {
 	conn.Write([]byte(fmt.Sprintf("SEND %d", len(segments))))
 	time.Sleep(time.Second)
 
-	timeout := 3 * time.Second
-
 	flip := 0
 	for _, segment := range segments { 
 		p := makePackage(flip, segment)
-		conn.Write(p)
 
 		conn.SetReadDeadline(time.Now().Add(timeout))
 		packageBuf := make([]byte, headerLength)
 		_, err := conn.Read(packageBuf)
 		for !isAck(flip, packageBuf) {
+			conn.Write(p)
 			for errors.Is(err, os.ErrDeadlineExceeded) { 
 				conn.SetReadDeadline(time.Now().Add(timeout))
 				_, err = conn.Read(packageBuf)
@@ -72,7 +74,7 @@ func makePackage(num int, data []byte) []byte {
 	l := int32(headerLength + len(data))
 	n := int8(num)
 	buf := new(bytes.Buffer)
-	fmt.Printf("Package: length: %d, num: %d, conte: %q\n", l, n, string(data))
+	fmt.Printf("Package: length: %d, num: %d\n", l, n)
 	binary.Write(buf, binary.LittleEndian, l) // length
 	binary.Write(buf, binary.LittleEndian, n) // 0 / 1
 	binary.Write(buf, binary.LittleEndian, int8(0)) // isAck
